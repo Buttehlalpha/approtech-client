@@ -31,6 +31,8 @@ const FarmerDashboard = () => {
     image: null as File | null,
   });
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   useEffect(() => {
     fetchProducts();
   }, []);
@@ -40,7 +42,7 @@ const FarmerDashboard = () => {
       const token = localStorage.getItem("token");
 
       const res = await axios.get(
-        "http://localhost:5000/api/products/my-products",
+        `${API_URL}/api/products/my-products`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -97,7 +99,7 @@ const FarmerDashboard = () => {
       const token = localStorage.getItem("token");
 
       await axios.delete(
-        `http://localhost:5000/api/products/${id}`,
+        `${API_URL}/api/products/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -127,7 +129,7 @@ const FarmerDashboard = () => {
       }
 
       await axios.post(
-        "http://localhost:5000/api/products/create",
+        `${API_URL}/api/products/create`,
         formData,
         {
           headers: {

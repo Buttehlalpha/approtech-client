@@ -27,6 +27,8 @@ const ProductDetail = () => {
 
   const [qty, setQty] = useState(1);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // FETCH SINGLE PRODUCT
   useEffect(() => {
     fetchProduct();
@@ -35,7 +37,7 @@ const ProductDetail = () => {
   const fetchProduct = async () => {
     try {
       const res = await axios.get(
-        "http://localhost:5000/api/products"
+        `${API_URL}/api/products`
       );
 
       const foundProduct = res.data.find(
@@ -106,7 +108,7 @@ const ProductDetail = () => {
             <img
               src={
                 product.image
-                  ? `http://localhost:5000/${product.image}`
+                  ? `${API_URL}/${product.image}`
                   : freshProduce
               }
               alt={product.name}

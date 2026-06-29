@@ -36,6 +36,8 @@ const Marketplace = () => {
 
   const [error, setError] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   // FETCH PRODUCTS FROM BACKEND
   useEffect(() => {
     const fetchProducts = async () => {
@@ -43,7 +45,7 @@ const Marketplace = () => {
         setLoading(true);
 
         const res = await axios.get(
-          "http://localhost:5000/api/products"
+          `${API_URL}/api/products`
         );
 
         setProducts(res.data);

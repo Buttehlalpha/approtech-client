@@ -21,6 +21,8 @@ const Index = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const topFarmers = farmers.slice(0, 3);
 
   // FETCH PRODUCTS FROM MONGODB
@@ -30,7 +32,7 @@ const Index = () => {
         setLoading(true);
         setError(null);
 
-        const res = await fetch("http://localhost:5000/api/products");
+        const res = await fetch(`${API_URL}/api/products`);
 
         if (!res.ok) {
           throw new Error("Failed to fetch products");
