@@ -5,6 +5,11 @@ import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 
+// Import logo directly (if logo is in src/assets)
+// OR keep using public folder path
+import logo from "@/assets/logo.jpg"; // <-- Use this if logo is in src/assets
+// If logo is in public folder, use: import logo from "/logo.jpg";
+
 const Navbar = () => {
   const { totalItems } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -22,11 +27,11 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
       <div className="container mx-auto flex h-16 items-center justify-between px-4">
         
-        {/* LOGO */}
+        {/* LOGO - FIXED */}
         <Link to="/" className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border bg-white shadow-sm">
             <img
-              src="/public/logo.jpg"
+              src="/logo.jpg"  // <-- FIXED: Removed "/public/" from path
               alt="AgriConnect Logo"
               className="h-full w-full object-cover"
             />

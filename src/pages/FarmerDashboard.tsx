@@ -20,6 +20,7 @@ const FarmerDashboard = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [myProducts, setMyProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -111,6 +112,14 @@ const FarmerDashboard = () => {
     }
   };
 
+  // Function to get correct image URL
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return freshProduce;
+    if (imagePath.startsWith('http')) return imagePath;
+    // If it's a relative path from the backend
+    return `${API_URL}/${imagePath}`;
+  };
+
   const handleUploadProduct = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -148,6 +157,7 @@ const FarmerDashboard = () => {
         category: "vegetables",
         image: null,
       });
+      setPreviewImage(null); // Clear preview after upload
 
       fetchProducts();
     } catch (error) {
@@ -287,8 +297,11 @@ const FarmerDashboard = () => {
                       className="flex items-center gap-4 border p-4 rounded-xl"
                     >
                       <img
-                        src={product.image || freshProduce}
+                        src={getImageUrl(product.image)}
                         className="h-14 w-14 rounded-lg object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = freshProduce;
+                        }}
                       />
 
                       <div className="flex-1">
@@ -359,14 +372,42 @@ const FarmerDashboard = () => {
 
                   <input
                     type="file"
-                    onChange={(e) =>
-                      setProductForm({
-                        ...productForm,
-                        image: e.target.files?.[0] || null,
-                      })
-                    }
+                    onChange={(e) => {
+                      const file = e.target.files?.[0] || null;
+                      if (file) {
+                        setPreviewImage(URL.createObjectURL(file));
+                        setProductForm({
+                          ...productForm,
+                          image: file,
+                        });
+                      }
+                    }}
                     className="border p-3 rounded-xl"
                   />
+
+                  {/* Image Preview */}
+                  {previewImage && (
+                    <div className="md:col-span-2">
+                      <img 
+                        src={previewImage} 
+                        alt="Preview" 
+                        className="h-32 w-32 rounded-lg object-cover"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewImage(null);
+                          setProductForm({
+                            ...productForm,
+                            image: null,
+                          });
+                        }}
+                        className="mt-2 text-sm text-red-600 hover:underline"
+                      >
+                        Remove Image
+                      </button>
+                    </div>
+                  )}
 
                   <button
                     className="bg-green-600 text-white p-3 rounded-xl md:col-span-2"

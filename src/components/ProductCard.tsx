@@ -24,6 +24,15 @@ const ProductCard = ({
   product,
 }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const API_URL = import.meta.env.VITE_API_URL;
+
+  // Function to get correct image URL
+  const getImageUrl = (imagePath: string) => {
+    if (!imagePath) return freshProduce;
+    if (imagePath.startsWith('http')) return imagePath;
+    // If it's a relative path from the backend
+    return `${API_URL}/${imagePath}`;
+  };
 
   return (
     <div className="group overflow-hidden rounded-xl border border-border bg-card shadow-soft transition-all duration-300 hover:-translate-y-1 hover:shadow-elevated">
@@ -33,13 +42,13 @@ const ProductCard = ({
         <div className="relative aspect-[4/3] overflow-hidden">
 
           <img
-            src={
-              product.image
-                ? product.image
-                : freshProduce
-            }
+            src={getImageUrl(product.image)}
             alt={product.name}
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            onError={(e) => {
+              // If image fails to load, use fallback
+              (e.target as HTMLImageElement).src = freshProduce;
+            }}
           />
 
           {!product.inStock && (
@@ -98,7 +107,7 @@ const ProductCard = ({
             </span>
 
             <span className="text-sm text-muted-foreground">
-              /{product.unit}
+              /{product.unit || 'kg'}
             </span>
           </div>
 
