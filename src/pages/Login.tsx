@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,17 +18,21 @@ const Login = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate fields
+    if (!email || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
     try {
       setLoading(true);
       setError("");
-      setSuccess("");
 
       const res = await axios.post(
         `${API_URL}/api/auth/login`,
@@ -48,8 +53,7 @@ const Login = () => {
         JSON.stringify(res.data.user)
       );
 
-      // SUCCESS MESSAGE
-      setSuccess("Login successful 🎉");
+      toast.success("Login successful! 🎉");
 
       const role = res.data.user.role;
 
@@ -64,10 +68,9 @@ const Login = () => {
 
     } catch (err: any) {
       console.error("Login error:", err);
-      setError(
-        err.response?.data?.message ||
-          "Login failed"
-      );
+      const errorMessage = err.response?.data?.message || "Login failed. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -128,17 +131,10 @@ const Login = () => {
             </Link>
           </p>
 
-          {/* ERROR */}
+          {/* ERROR - Keep for inline display too */}
           {error && (
             <p className="mt-4 text-sm text-red-500">
               {error}
-            </p>
-          )}
-
-          {/* SUCCESS */}
-          {success && (
-            <p className="mt-4 text-sm text-green-600 font-medium">
-              {success}
             </p>
           )}
 
@@ -161,6 +157,7 @@ const Login = () => {
                   setEmail(e.target.value)
                 }
                 className="mt-1"
+                required
               />
             </div>
 
@@ -177,6 +174,7 @@ const Login = () => {
                   setPassword(e.target.value)
                 }
                 className="mt-1"
+                required
               />
             </div>
 

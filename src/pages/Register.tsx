@@ -1,6 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios, { AxiosError } from "axios";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,6 @@ const Register = () => {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const API_URL = import.meta.env.VITE_API_URL;
 
@@ -29,15 +29,28 @@ const Register = () => {
 
     if (loading) return;
 
+    // Validate fields
     if (!form.name || !form.email || !form.password) {
-      setError("All fields are required");
+      toast.error("All fields are required");
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email)) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+
+    // Validate password length
+    if (form.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
       return;
     }
 
     try {
       setLoading(true);
       setError("");
-      setSuccess("");
 
       const res = await axios.post(
         `${API_URL}/api/auth/register`,
@@ -47,7 +60,7 @@ const Register = () => {
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      setSuccess("Account created successfully 🎉");
+      toast.success("Account created successfully! 🎉");
 
       setTimeout(() => {
         if (res.data.user.role === "buyer") {
@@ -59,10 +72,9 @@ const Register = () => {
 
     } catch (err) {
       const error = err as AxiosError<{ message: string }>;
-
-      setError(
-        error.response?.data?.message || "Registration failed"
-      );
+      const errorMessage = error.response?.data?.message || "Registration failed. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -130,13 +142,6 @@ const Register = () => {
             <p className="mt-4 text-sm text-red-500">{error}</p>
           )}
 
-          {/* SUCCESS */}
-          {success && (
-            <p className="mt-4 text-sm text-green-600 font-medium">
-              {success}
-            </p>
-          )}
-
           {/* FORM */}
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
 
@@ -148,6 +153,7 @@ const Register = () => {
                 onChange={(e) =>
                   setForm({ ...form, name: e.target.value })
                 }
+                required
               />
             </div>
 
@@ -160,6 +166,7 @@ const Register = () => {
                 onChange={(e) =>
                   setForm({ ...form, email: e.target.value })
                 }
+                required
               />
             </div>
 
@@ -167,12 +174,17 @@ const Register = () => {
               <Label>Password</Label>
               <Input
                 type="password"
-                placeholder="••••••••"
+                placeholder="•••••••• (min 6 characters)"
                 value={form.password}
                 onChange={(e) =>
                   setForm({ ...form, password: e.target.value })
                 }
+                required
+                minLength={6}
               />
+              <p className="text-xs text-muted-foreground mt-1">
+                Password must be at least 6 characters
+              </p>
             </div>
 
             {/* ROLE */}

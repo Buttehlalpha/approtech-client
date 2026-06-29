@@ -8,20 +8,21 @@ import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-import Index from "./src/pages/Index";
-import Marketplace from "./src/pages/Marketplace";
-import ProductDetail from "./src/pages/ProductDetail";
-import Cart from "./src/pages/Cart";
-import Farmers from "./src/pages/Farmers";
-import FarmerDashboard from "./src/pages/FarmerDashboard";
-import Login from "./src/pages/Login";
-import Register from "./src/pages/Register";
-import NotFound from "./src/pages/NotFound";
+// FIXED: Removed "./src/" from import paths
+import Index from "@/pages/Index";
+import Marketplace from "@/pages/Marketplace";
+import ProductDetail from "@/pages/ProductDetail";
+import Cart from "@/pages/Cart";
+import Farmers from "@/pages/Farmers";
+import FarmerDashboard from "@/pages/FarmerDashboard";
+import Login from "@/pages/Login";
+import Register from "@/pages/Register";
+import NotFound from "@/pages/NotFound";
 
 const queryClient = new QueryClient();
 
 /* PUBLIC LAYOUT */
-const PublicLayout = ({ children }) => (
+const PublicLayout = ({ children }: { children: React.ReactNode }) => (
   <>
     <Navbar />
     {children}
@@ -34,7 +35,7 @@ const App = () => (
     <TooltipProvider>
       <CartProvider>
         <Toaster />
-        <Sonner />
+        <Sonner position="top-right" richColors closeButton duration={3000} />
 
         <BrowserRouter>
           <Routes>
