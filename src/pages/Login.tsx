@@ -19,6 +19,8 @@ const Login = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  const API_URL = import.meta.env.VITE_API_URL;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -28,7 +30,7 @@ const Login = () => {
       setSuccess("");
 
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${API_URL}/api/auth/login`,
         {
           email,
           password,
@@ -61,6 +63,7 @@ const Login = () => {
       }, 800);
 
     } catch (err: any) {
+      console.error("Login error:", err);
       setError(
         err.response?.data?.message ||
           "Login failed"

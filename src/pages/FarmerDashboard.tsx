@@ -20,7 +20,6 @@ const FarmerDashboard = () => {
   const [currentPage, setCurrentPage] = useState("dashboard");
   const [myProducts, setMyProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const user = JSON.parse(localStorage.getItem("user") || "{}");
 
@@ -112,11 +111,9 @@ const FarmerDashboard = () => {
     }
   };
 
-  // Function to get correct image URL
   const getImageUrl = (imagePath: string) => {
     if (!imagePath) return freshProduce;
     if (imagePath.startsWith('http')) return imagePath;
-    // If it's a relative path from the backend
     return `${API_URL}/${imagePath}`;
   };
 
@@ -157,12 +154,11 @@ const FarmerDashboard = () => {
         category: "vegetables",
         image: null,
       });
-      setPreviewImage(null); // Clear preview after upload
 
       fetchProducts();
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      alert("Upload failed");
+      alert(error.response?.data?.message || "Upload failed");
     } finally {
       setLoading(false);
     }
@@ -321,7 +317,7 @@ const FarmerDashboard = () => {
                 </div>
               </div>
 
-              {/* UPLOAD */}
+              {/* UPLOAD - NO PREVIEW */}
               <div className="rounded-2xl bg-white p-6">
                 <h2 className="text-xl font-semibold mb-6">
                   Upload Product
@@ -372,42 +368,14 @@ const FarmerDashboard = () => {
 
                   <input
                     type="file"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0] || null;
-                      if (file) {
-                        setPreviewImage(URL.createObjectURL(file));
-                        setProductForm({
-                          ...productForm,
-                          image: file,
-                        });
-                      }
-                    }}
+                    onChange={(e) =>
+                      setProductForm({
+                        ...productForm,
+                        image: e.target.files?.[0] || null,
+                      })
+                    }
                     className="border p-3 rounded-xl"
                   />
-
-                  {/* Image Preview */}
-                  {previewImage && (
-                    <div className="md:col-span-2">
-                      <img 
-                        src={previewImage} 
-                        alt="Preview" 
-                        className="h-32 w-32 rounded-lg object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPreviewImage(null);
-                          setProductForm({
-                            ...productForm,
-                            image: null,
-                          });
-                        }}
-                        className="mt-2 text-sm text-red-600 hover:underline"
-                      >
-                        Remove Image
-                      </button>
-                    </div>
-                  )}
 
                   <button
                     className="bg-green-600 text-white p-3 rounded-xl md:col-span-2"
