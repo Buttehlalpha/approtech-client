@@ -8,11 +8,12 @@ import { CartProvider } from "@/context/CartContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
-// FIXED: Removed "./src/" from import paths
 import Index from "@/pages/Index";
 import Marketplace from "@/pages/Marketplace";
 import ProductDetail from "@/pages/ProductDetail";
 import Cart from "@/pages/Cart";
+import Checkout from "@/pages/Checkout";
+import Orders from "@/pages/Orders";
 import Farmers from "@/pages/Farmers";
 import FarmerDashboard from "@/pages/FarmerDashboard";
 import Login from "@/pages/Login";
@@ -39,7 +40,6 @@ const App = () => (
 
         <BrowserRouter>
           <Routes>
-
             {/* AUTH */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
@@ -81,6 +81,26 @@ const App = () => (
               }
             />
 
+            {/* ✅ CHECKOUT - Must be before 404 */}
+            <Route
+              path="/checkout"
+              element={
+                <PublicLayout>
+                  <Checkout />
+                </PublicLayout>
+              }
+            />
+
+            {/* ✅ ORDERS */}
+            <Route
+              path="/orders"
+              element={
+                <PublicLayout>
+                  <Orders />
+                </PublicLayout>
+              }
+            />
+
             <Route
               path="/farmers"
               element={
@@ -90,10 +110,10 @@ const App = () => (
               }
             />
 
-            {/* DASHBOARD (SELF-CONTAINED FILE) */}
+            {/* DASHBOARD */}
             <Route path="/dashboard" element={<FarmerDashboard />} />
 
-            {/* 404 */}
+            {/* ✅ 404 - Must be LAST */}
             <Route
               path="*"
               element={
@@ -102,10 +122,8 @@ const App = () => (
                 </PublicLayout>
               }
             />
-
           </Routes>
         </BrowserRouter>
-
       </CartProvider>
     </TooltipProvider>
   </QueryClientProvider>

@@ -39,14 +39,12 @@ const Checkout = () => {
   const deliveryFee = 2000;
   const total = totalPrice + deliveryFee;
 
-  // Bank details
   const bankDetails = {
     bankName: "GTBank",
     accountName: "AgriConnect Farms",
     accountNumber: "0123456789",
   };
 
-  // Redirect if cart is empty
   useEffect(() => {
     if (items.length === 0 && !orderComplete) {
       navigate("/cart");
@@ -64,16 +62,19 @@ const Checkout = () => {
     return "ORD-" + Date.now().toString().slice(-8) + Math.random().toString(36).slice(-4).toUpperCase();
   };
 
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard!");
+  };
+
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Validate form
     if (!formData.fullName || !formData.email || !formData.phone || !formData.address) {
       toast.error("Please fill in all required fields");
       return;
     }
 
-    // Validate email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast.error("Please enter a valid email address");
@@ -126,8 +127,6 @@ const Checkout = () => {
       
       setOrderId(response.data.order?._id || ref);
       setOrderComplete(true);
-      
-      // Clear cart after successful order
       clearCart();
       
       toast.success("Order placed successfully! 🎉");
@@ -140,12 +139,6 @@ const Checkout = () => {
     }
   };
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast.success("Copied to clipboard!");
-  };
-
-  // Order Summary Component
   const OrderSummary = () => (
     <div className="bg-gray-50 rounded-xl p-4 space-y-3">
       <h3 className="font-semibold text-gray-800">Order Summary</h3>
@@ -174,7 +167,6 @@ const Checkout = () => {
     </div>
   );
 
-  // Bank Transfer Details Component
   const BankTransferDetails = () => (
     <div className="bg-blue-50 border border-blue-200 rounded-xl p-6 space-y-4">
       <h4 className="font-semibold text-blue-800 flex items-center gap-2">
@@ -213,7 +205,6 @@ const Checkout = () => {
     </div>
   );
 
-  // Order Success Page
   if (orderComplete) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
@@ -224,9 +215,7 @@ const Checkout = () => {
             </div>
             
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Order Placed! 🎉</h2>
-            <p className="text-gray-600 mb-4">
-              Your order has been placed successfully.
-            </p>
+            <p className="text-gray-600 mb-4">Your order has been placed successfully.</p>
             
             <div className="bg-gray-50 rounded-lg p-4 mb-6">
               <p className="text-sm text-gray-600">Order Reference</p>
@@ -247,14 +236,10 @@ const Checkout = () => {
 
             <div className="flex gap-3 mt-6">
               <Link to="/marketplace" className="flex-1">
-                <Button variant="outline" className="w-full">
-                  Continue Shopping
-                </Button>
+                <Button variant="outline" className="w-full">Continue Shopping</Button>
               </Link>
               <Link to="/orders" className="flex-1">
-                <Button className="w-full bg-green-600 hover:bg-green-700">
-                  View Orders
-                </Button>
+                <Button className="w-full bg-green-600 hover:bg-green-700">View Orders</Button>
               </Link>
             </div>
           </div>
@@ -266,18 +251,14 @@ const Checkout = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container max-w-4xl mx-auto px-4">
-        {/* Back Button */}
         <Link to="/cart" className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-800 mb-6">
-          <ArrowLeft className="h-4 w-4" />
-          Back to Cart
+          <ArrowLeft className="h-4 w-4" /> Back to Cart
         </Link>
 
         <h1 className="text-2xl font-bold text-gray-800 mb-6">Checkout</h1>
 
         <div className="grid lg:grid-cols-3 gap-6">
-          {/* Left Column - Form */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Customer Details */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Delivery Details</h2>
               
@@ -375,10 +356,8 @@ const Checkout = () => {
               </form>
             </div>
 
-            {/* Payment Method */}
             <div className="bg-white rounded-xl shadow-sm p-6">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Payment Method</h2>
-              
               <div className="border-2 border-green-600 bg-green-50 rounded-xl p-4 flex items-center gap-4">
                 <Banknote className="h-6 w-6 text-green-600" />
                 <div>
@@ -387,20 +366,15 @@ const Checkout = () => {
                 </div>
                 <CheckCircle className="h-5 w-5 text-green-600 ml-auto" />
               </div>
-
               <div className="mt-4 p-4 bg-gray-50 rounded-xl">
-                <p className="text-sm text-gray-600">
-                  💳 You'll see bank details after placing your order
-                </p>
+                <p className="text-sm text-gray-600">💳 You'll see bank details after placing your order</p>
               </div>
             </div>
           </div>
 
-          {/* Right Column - Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm p-6 sticky top-4">
               <h2 className="text-lg font-semibold text-gray-800 mb-4">Order Summary</h2>
-              
               <OrderSummary />
 
               <Button
