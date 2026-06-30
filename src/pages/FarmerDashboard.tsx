@@ -62,10 +62,14 @@ const FarmerDashboard = () => {
         }
       );
 
-      console.log("Fetched products:", res.data);
+      console.log("✅ Fetched products:", res.data);
+      res.data.forEach((product: any, index: number) => {
+        console.log(`📦 Product ${index + 1}: ${product.name} - Image: ${product.image || 'No image'}`);
+      });
+
       setMyProducts(res.data);
     } catch (error: any) {
-      console.error("Fetch products error:", error);
+      console.error("❌ Fetch products error:", error);
       toast.error(error.response?.data?.message || "Failed to load products");
     } finally {
       setLoading(false);
@@ -146,7 +150,7 @@ const FarmerDashboard = () => {
   };
 
   const getImageUrl = (imagePath: string) => {
-    console.log("Original image path:", imagePath);
+    console.log("🔍 Original image path:", imagePath);
     
     if (!imagePath) {
       return freshProduce;
@@ -196,6 +200,15 @@ const FarmerDashboard = () => {
       formData.append("category", productForm.category);
       formData.append("image", productForm.image);
 
+      console.log("=== UPLOADING PRODUCT ===");
+      console.log("Product data:", {
+        name: productForm.name,
+        price: productForm.price,
+        unit: productForm.unit,
+        category: productForm.category,
+        image: productForm.image?.name || "No image"
+      });
+
       const response = await axios.post(
         `${API_URL}/api/products/create`,
         formData,
@@ -207,8 +220,8 @@ const FarmerDashboard = () => {
         }
       );
 
-      console.log("Upload Response:", response.data);
-      console.log("Image Path from server:", response.data.product?.image || response.data.image);
+      console.log("✅ Upload Response:", response.data);
+      console.log("✅ Image URL from server:", response.data.product?.image);
 
       toast.success("Product uploaded successfully! 🎉");
 
@@ -223,10 +236,11 @@ const FarmerDashboard = () => {
       const fileInput = document.getElementById('image-upload') as HTMLInputElement;
       if (fileInput) fileInput.value = '';
 
-      fetchProducts();
+      await fetchProducts();
+
     } catch (error: any) {
-      console.error("Upload Error:", error);
-      console.error("Error Response:", error.response?.data);
+      console.error("❌ Upload Error:", error);
+      console.error("❌ Error Response:", error.response?.data);
       toast.error(error.response?.data?.message || "Upload failed");
     } finally {
       setUploadLoading(false);
@@ -253,49 +267,53 @@ const FarmerDashboard = () => {
       );
     }
 
-    return myProducts.map((product: any) => (
-      <div
-        key={product._id}
-        className="flex items-center gap-4 border p-4 rounded-xl hover:shadow-md transition-shadow flex-wrap"
-      >
-        <img
-          src={getImageUrl(product.image)}
-          className="h-16 w-16 rounded-lg object-cover border"
-          onError={(e) => {
-            console.log("Image failed to load:", product.image);
-            (e.target as HTMLImageElement).src = freshProduce;
-          }}
-          alt={product.name}
-        />
+    return myProducts.map((product: any) => {
+      console.log(`📦 Rendering ${product.name} - Image: ${product.image}`);
+      return (
+        <div
+          key={product._id}
+          className="flex items-center gap-4 border p-4 rounded-xl hover:shadow-md transition-shadow flex-wrap"
+        >
+          <img
+            src={getImageUrl(product.image)}
+            className="h-16 w-16 rounded-lg object-cover border"
+            onError={(e) => {
+              console.error("❌ Image failed to load:", product.image);
+              (e.target as HTMLImageElement).src = freshProduce;
+            }}
+            alt={product.name}
+          />
 
-        <div className="flex-1 min-w-[150px]">
-          <h3 className="font-semibold text-gray-800">{product.name}</h3>
-          <p className="text-sm text-gray-500">
-            ₦{Number(product.price).toLocaleString()} / {product.unit}
-          </p>
-          <p className="text-xs text-gray-400 capitalize">Category: {product.category}</p>
-        </div>
+          <div className="flex-1 min-w-[150px]">
+            <h3 className="font-semibold text-gray-800">{product.name}</h3>
+            <p className="text-sm text-gray-500">
+              ₦{Number(product.price).toLocaleString()} / {product.unit}
+            </p>
+            <p className="text-xs text-gray-400 capitalize">Category: {product.category}</p>
+            <p className="text-xs text-gray-400">Image path: {product.image || 'No image'}</p>
+          </div>
 
-        <div className="flex items-center gap-2">
-          <span className={`px-2 py-1 rounded-full text-xs ${
-            product.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-          }`}>
-            {product.inStock ? 'In Stock' : 'Out of Stock'}
-          </span>
-          <button 
-            onClick={() => deleteProduct(product._id)}
-            disabled={deleteLoading === product._id}
-            className="text-red-600 hover:text-red-800 transition-colors p-2 hover:bg-red-50 rounded-lg disabled:opacity-50"
-          >
-            {deleteLoading === product._id ? (
-              <div className="h-5 w-5 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
-            ) : (
-              <Trash2 className="h-5 w-5" />
-            )}
-          </button>
+          <div className="flex items-center gap-2">
+            <span className={`px-2 py-1 rounded-full text-xs ${
+              product.inStock ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+            }`}>
+              {product.inStock ? 'In Stock' : 'Out of Stock'}
+            </span>
+            <button 
+              onClick={() => deleteProduct(product._id)}
+              disabled={deleteLoading === product._id}
+              className="text-red-600 hover:text-red-800 transition-colors p-2 hover:bg-red-50 rounded-lg disabled:opacity-50"
+            >
+              {deleteLoading === product._id ? (
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-red-600 border-t-transparent"></div>
+              ) : (
+                <Trash2 className="h-5 w-5" />
+              )}
+            </button>
+          </div>
         </div>
-      </div>
-    ));
+      );
+    });
   };
 
   return (
@@ -314,13 +332,11 @@ const FarmerDashboard = () => {
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
         lg:translate-x-0 lg:static lg:shadow-none
       `}>
-        {/* Logo */}
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-green-700">AgriConnect</h1>
           <p className="mt-1 text-sm text-gray-500">Smart farming marketplace</p>
         </div>
 
-        {/* User Profile */}
         <div className="mb-8 rounded-2xl bg-gradient-to-r from-green-600 to-green-700 p-5 text-white shadow-lg">
           <div className="flex items-center gap-4">
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white text-green-700 font-bold text-lg">
@@ -333,7 +349,6 @@ const FarmerDashboard = () => {
           </div>
         </div>
 
-        {/* Navigation */}
         <nav className="space-y-1">
           <button
             onClick={() => { setCurrentPage("dashboard"); setSidebarOpen(false); }}
@@ -367,7 +382,6 @@ const FarmerDashboard = () => {
           </button>
         </nav>
 
-        {/* Logout Button - Mobile */}
         <div className="mt-auto lg:hidden pt-6 border-t">
           <button
             onClick={handleLogout}
@@ -417,7 +431,6 @@ const FarmerDashboard = () => {
                 ))}
               </div>
 
-              {/* Quick Actions */}
               <div className="bg-white rounded-2xl border p-6">
                 <h3 className="text-lg font-semibold text-gray-800 mb-4">Quick Actions</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -443,7 +456,6 @@ const FarmerDashboard = () => {
           {/* My Produce */}
           {currentPage === "myProduce" && (
             <div className="space-y-6">
-              {/* Products List */}
               <div className="rounded-2xl bg-white p-4 lg:p-6 border shadow-sm">
                 <div className="flex items-center justify-between mb-6">
                   <h2 className="text-xl font-semibold text-gray-800">
@@ -462,7 +474,6 @@ const FarmerDashboard = () => {
                 </div>
               </div>
 
-              {/* Upload Product */}
               <div className="rounded-2xl bg-white p-4 lg:p-6 border shadow-sm">
                 <h2 className="text-xl font-semibold text-gray-800 mb-6 flex items-center gap-2">
                   <PlusCircle className="h-5 w-5 text-green-600" />
