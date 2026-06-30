@@ -149,26 +149,42 @@ const FarmerDashboard = () => {
     }
   };
 
+  // ✅ FIXED: Better image URL handling with localhost replacement
   const getImageUrl = (imagePath: string) => {
     console.log("🔍 Original image path:", imagePath);
     
     if (!imagePath) {
+      console.log("❌ No image path, using fallback");
       return freshProduce;
     }
     
-    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
-      return imagePath;
+    // ✅ FIX: Replace localhost with production URL
+    let fixedPath = imagePath;
+    if (imagePath.includes('localhost:5000')) {
+      fixedPath = imagePath.replace('http://localhost:5000', 'https://approtech-backend.onrender.com');
+      console.log("🔄 Fixed localhost URL:", fixedPath);
     }
     
-    if (imagePath.startsWith('uploads/')) {
-      return `${API_URL}/${imagePath}`;
+    if (fixedPath.startsWith('http://') || fixedPath.startsWith('https://')) {
+      console.log("✅ Using full URL:", fixedPath);
+      return fixedPath;
     }
     
-    if (!imagePath.includes('/')) {
-      return `${API_URL}/uploads/${imagePath}`;
+    if (fixedPath.startsWith('uploads/')) {
+      const fullUrl = `${API_URL}/${fixedPath}`;
+      console.log("✅ Using uploads path:", fullUrl);
+      return fullUrl;
     }
     
-    return `${API_URL}/${imagePath}`;
+    if (!fixedPath.includes('/')) {
+      const fullUrl = `${API_URL}/uploads/${fixedPath}`;
+      console.log("✅ Using filename:", fullUrl);
+      return fullUrl;
+    }
+    
+    const fullUrl = `${API_URL}/${fixedPath}`;
+    console.log("✅ Using default path:", fullUrl);
+    return fullUrl;
   };
 
   const handleUploadProduct = async (e: React.FormEvent) => {
@@ -269,16 +285,22 @@ const FarmerDashboard = () => {
 
     return myProducts.map((product: any) => {
       console.log(`📦 Rendering ${product.name} - Image: ${product.image}`);
+      
+      // ✅ Get the image URL with localhost fix
+      const imageUrl = getImageUrl(product.image);
+      console.log(`🖼️ Final image URL for ${product.name}:`, imageUrl);
+      
       return (
         <div
           key={product._id}
           className="flex items-center gap-4 border p-4 rounded-xl hover:shadow-md transition-shadow flex-wrap"
         >
           <img
-            src={getImageUrl(product.image)}
+            src={imageUrl}
             className="h-16 w-16 rounded-lg object-cover border"
             onError={(e) => {
               console.error("❌ Image failed to load:", product.image);
+              console.error("❌ Attempted URL:", imageUrl);
               (e.target as HTMLImageElement).src = freshProduce;
             }}
             alt={product.name}
@@ -290,7 +312,7 @@ const FarmerDashboard = () => {
               ₦{Number(product.price).toLocaleString()} / {product.unit}
             </p>
             <p className="text-xs text-gray-400 capitalize">Category: {product.category}</p>
-            <p className="text-xs text-gray-400">Image path: {product.image || 'No image'}</p>
+            <p className="text-xs text-gray-400 break-all">Image path: {product.image || 'No image'}</p>
           </div>
 
           <div className="flex items-center gap-2">
